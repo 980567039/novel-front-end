@@ -7,9 +7,12 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
-    test: 'test'
+    title: ''
   },
   mutations: {
+    SET_STATE(commit, state) {
+      commit[state.key] = state.val
+    }
   },
   actions: {
   },

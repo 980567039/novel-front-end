@@ -18,12 +18,12 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
   name: 'App',
   data() {
     return {
       animate: "",
-      title: '',
       active: 0,
       tabBar: [
         { name: '书架', path: '/bookCollect', icon: 'shop-collect' }, 
@@ -32,10 +32,15 @@ export default {
         { name: '搜索', path: '/search', icon: 'search' }]
     }
   },
+  computed: {
+    ...mapState(['title'])
+  },
   watch: {
     $route(v, from) {
       this.animate = v.meta.index > from.meta.index ? "slide-left" : "slide-right";
-      this.title = v.meta.name
+      if(v.meta.name) {
+        this.$store.commit('SET_STATE', { key: 'title', val: v.meta.name })
+      }     
     },
   },
   methods: {
