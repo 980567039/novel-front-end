@@ -11,7 +11,7 @@
     <transition :name="animate">
       <router-view></router-view>
     </transition>
-    <van-tabbar v-model="active">
+    <van-tabbar v-show="showTabbar" v-model="active">
       <van-tabbar-item v-for="(item, index) in tabBar" :key="index" :to="item.path" :icon="item.icon"> {{ item.name }} </van-tabbar-item>
     </van-tabbar>
   </div>
@@ -29,11 +29,17 @@ export default {
         { name: '书架', path: '/bookCollect', icon: 'shop-collect' }, 
         { name: '分类', path: '/categories', icon: 'apps-o' }, 
         { name: '排行', path: '/rank', icon: 'chart-trending-o' },  
-        { name: '搜索', path: '/search', icon: 'search' }]
+        { name: '搜索', path: '/search', icon: 'search' }
+      ]
+      
     }
   },
   computed: {
-    ...mapState(['title'])
+    ...mapState(['title']),
+    showTabbar() {
+      const hideTabList = ['/reade']
+      return hideTabList.includes(this.$route.name)
+    }
   },
   watch: {
     $route(v, from) {
@@ -44,7 +50,9 @@ export default {
     },
   },
   methods: {
-    close_return() {},
+    close_return() {
+      this.$router.go(-1)
+    },
     showFunction() {}
   }
 }

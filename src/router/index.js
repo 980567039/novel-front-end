@@ -13,5 +13,6 @@ export default new Router({
     { path: '/rank',  meta: { name: '排行' }, component: () => _import('views/Rank')},
     { path: '/search',  meta: { name: '搜索' }, component: () => _import('views/Search')},
     { path: '/novelInfo',  meta: { name: '' }, component: () => _import('components/NovelInfo')},
+    { path: '/reade',  meta: { name: '' }, component: () => _import('components/Reade')},
   ]
 })

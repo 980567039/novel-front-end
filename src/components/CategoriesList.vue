@@ -39,7 +39,7 @@ export default {
     toNovelInfo(item) {
       this.$router.push({
         path: '/novelInfo',
-        query: { id: item.id }
+        query: { id: item.id, title: item.name }
       })
       this.$route.meta.name = item.name
     },

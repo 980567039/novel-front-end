@@ -6,6 +6,8 @@ import router from './router'
 import 'normalize.css'
 import Vant from 'vant'
 import 'vant/lib/index.css'
+import Touch from '@/utils/touch' // eslint-disable-line
+import '@/assets/common/common.scss'
 //全局组件
 import GL_Component from '@/utils/globalComponents'
 

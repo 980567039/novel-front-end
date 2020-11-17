@@ -1,7 +1,7 @@
 <template>
   <div id="appBar" class="header" :style="{ background: background }">
     <div @touchstart="leftClick" class="left">
-      <span :class="[(leftIcon || 'icon-back')]" class="li365"></span>
+      <van-icon size="20px" name="arrow-left" />
     </div>
     <div v-if="title" class="title">{{ title }}</div>
     <slot name="title"></slot>
