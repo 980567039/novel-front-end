@@ -38,7 +38,7 @@ export default {
     ...mapState(['title']),
     showTabbar() {
       const hideTabList = ['/reade']
-      return hideTabList.includes(this.$route.name)
+      return !hideTabList.includes(this.$route.path)
     }
   },
   watch: {

@@ -1,5 +1,5 @@
 <template>
-  <div v-swipeup="swipeup" v-swipedown="swipedown" id="reade" class="flexContent">
+  <div v-longtap="swipeup" v-tap="swipedown" id="reade" class="flexContent">
     <van-popup 
       v-model="showChapter"
       position="bottom"
@@ -23,8 +23,12 @@
       </div>
     </van-popup>
     <div class="content">
+      <p v-if="chapterData" class="title"> {{ chapterData.title }} </p>
       <p v-for="(item, index) in content.split(/[\n | \t | \s]+/)" :key="'content'+index">{{ item }}</p>
     </div>
+    <!-- <van-swipe @change="change" :loop="false" class="my-swipe" indicator-color="white">
+      <van-swipe-item v-for="(item, index) in arr" :key="'content'+index"> {{item}} </van-swipe-item>
+    </van-swipe> -->
   </div>
 </template>
 
@@ -40,13 +44,19 @@ export default {
     chapterList: [],
     showTools: false,
     showChapter: false,
-    content: ''
+    chapterData: null,
+    content: '',
    }
   },
   created() {
     this.getNovelChapter()
   },
   methods: {
+    change(item) {
+      console.log(this.index)
+      console.log(item)
+      this.index = item
+    },
     getNovelChapter() {
       const id = this.$route.query.id
       getNovelChapter({ id: id, page: this.page, pageSize: this.pageSize }).then(res => {
@@ -54,6 +64,8 @@ export default {
         if(this.$route.query.chapterId == null) {
           this.getChapterContent(this.chapterList[0].id)
           this.$router.push({query:merge(this.$route.query,{'chapterId': this.chapterList[0].id})})
+          this.chapterData = this.chapterList[0]
+          console.log(this.chapterData)
         }else{
           this.getChapterContent(this.$route.query.id)
         }
@@ -68,15 +80,28 @@ export default {
     getChapterContent(chapterId) {
       getChapterContent({chapterId: chapterId}).then(res => {
         this.content = res.data.content
-        console.log(this.content.split(/[\n | \t | \s]+/))
+        this.arr = this.contentSplitPiece(this.content)
       })
-    }
+    },
+    contentSplitPiece(content) {
+      const pageSize = 1000
+      let arr = []
+      let piece = parseInt(this.content.length / pageSize)
+      if(this.content.length % pageSize > 0) piece += 1
+      for(let i=0; i<piece; i++) {
+        const start = i * pageSize
+        const end = (i + 1) * pageSize
+        arr.push(content.slice(start, end))
+      }
+      return arr
+    },
   }
 }
 </script>
 
 <style lang='scss' scoped>
 #reade{
+  padding-bottom: 0;
   .chapterOverlay{
     z-index: 1999 !important;
   }
@@ -113,9 +138,20 @@ export default {
     }
   }
   .content{
+    padding: 15px;
+    font-size: 16px;
+    overflow: scroll;
+    height: 100%;
+    .title{
+      font-size: 20px;
+    }
     p{
+      line-height: 25px;
       text-align: left;
     }
+  }
+  .my-swipe{
+    height: 100%;
   }
 }
 </style>

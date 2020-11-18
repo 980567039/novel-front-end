@@ -36,7 +36,7 @@ export default {
     toReade() {
       this.$router.push({
         path: '/reade',
-        query: { id: this.data.id, title: this.data.name, chapterId: null }
+        query: { id: this.data.id, title: this.data.name, chapterId: null}
       })
       this.$route.meta.name = this.data.name
     }
