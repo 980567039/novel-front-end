@@ -1,5 +1,5 @@
 <template>
-  <div v-longtap="swipeup" v-tap="swipedown" id="reade" class="flexContent">
+  <div @click.stop="swipedown" id="reade" class="flexContent">
     <van-popup 
       v-model="showChapter"
       position="bottom"
@@ -9,9 +9,16 @@
       class="chapterPopup"
     >
       <div class="chapterBox">
-        <p>{{ $route.query.title }} <van-icon name="arrow" /> </p>
+        <div class="top">
+          <p>{{ $route.query.title }} <van-icon name="arrow" /> </p>
+          <p> <span v-if="isTop" @click.stop="scrollTop('bottom')"><van-icon name="down" /> 去底部</span> <span v-else  @click.stop="scrollTop('bottom')"><van-icon name="down" /> 去顶部</span></p>
+        </div>
         <div class="chapterList">
-          <div v-for="(chapter, index) in chapterList" :key="`chapter${index}`" class="van-hairline--top"> {{ chapter.title }} </div>
+          <div 
+            v-for="(chapter, index) in chapterList" 
+            :key="`chapter${index}`"
+            :class="{ 'active': chapter.id == $route.query.chapterId }"
+            class="van-hairline--top"> {{ chapter.title }} </div>
         </div>
       </div>
     </van-popup>
@@ -22,7 +29,7 @@
         <div>A</div>
       </div>
     </van-popup>
-    <div class="content">
+    <div id="content" class="content">
       <p v-if="chapterData" class="title"> {{ chapterData.title }} </p>
       <p v-for="(item, index) in content.split(/[\n | \t | \s]+/)" :key="'content'+index">{{ item }}</p>
     </div>
@@ -35,6 +42,7 @@
 <script>
 import merge from 'webpack-merge';
 import { getNovelChapter, getChapterContent } from '@/api'
+import { scrollTop } from '@/utils/index'
 export default {
   name:'',
   data(){
@@ -46,15 +54,24 @@ export default {
     showChapter: false,
     chapterData: null,
     content: '',
+    isTop: true
    }
   },
   created() {
     this.getNovelChapter()
   },
   methods: {
+    scrollTop() {
+      const el = document.querySelector('.chapterList')
+      this.isTop = !this.isTop
+      if(this.isTop) {
+        scrollTop(el, 0, 200)
+      } else {
+        scrollTop(el, el.scrollHeight, 200)
+      }
+      
+    },
     change(item) {
-      console.log(this.index)
-      console.log(item)
       this.index = item
     },
     getNovelChapter() {
@@ -72,10 +89,7 @@ export default {
       })
     },
     swipedown() {
-      this.showTools = false
-    },
-    swipeup() {
-      this.showTools = true
+      this.showTools = !this.showTools
     },
     getChapterContent(chapterId) {
       getChapterContent({chapterId: chapterId}).then(res => {
@@ -108,16 +122,36 @@ export default {
   .chapterPopup{
     z-index: 2000 !important;
     .chapterBox{
+      display: flex;
+      flex-direction: column;
+      height: 100%;
       padding: 10px 20px;
-      p{
-        font-size: 16px;
-        text-align: left;
-        margin: 10px 0;
-        i{
-          vertical-align: text-bottom;
+      box-sizing: border-box;
+      .top{
+        display: flex;
+        p:first-child{
+          font-size: 16px;
+          text-align: left;
+          margin: 10px 0;
+          flex: 1;
+          i{
+            vertical-align: text-bottom;
+          }
+        }
+        p:last-child{
+          color: #3b84eb;
+          i{
+            vertical-align: text-top;
+          }
         }
       }
       .chapterList{
+        flex: 1;
+        overflow: scroll;
+        .active{
+          color: #3b84eb;
+          font-size: 14px;
+        }
         div{
           height: 35px;
           line-height: 35px;
