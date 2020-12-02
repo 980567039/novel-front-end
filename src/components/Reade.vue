@@ -1,5 +1,5 @@
 <template>
-  <div @click.stop="swipedown" id="reade" class="flexContent">
+  <div v-swipeleft="next" v-swiperight="prev" @click.stop="swipedown" id="reade" class="flexContent">
     <van-popup 
       v-model="showChapter"
       position="bottom"
@@ -16,20 +16,22 @@
         <div class="chapterList">
           <div 
             v-for="(chapter, index) in chapterList" 
+            @click.stop="toRead(chapter)"
             :key="`chapter${index}`"
-            :class="{ 'active': chapter.id == $route.query.chapterId }"
+            :class="{ 'active': chapter.index == $route.query.index }"
             class="van-hairline--top"> {{ chapter.title }} </div>
         </div>
       </div>
     </van-popup>
     <van-popup v-model="showTools" position="bottom" :overlay="false" :style="{ height: '8%' }">
+      <van-slider v-model="value" :min="12" :max="30" />
       <div class="tools van-hairline--top">
         <div @click="showChapter = true"><van-icon name="wap-nav" /></div>
         <div><van-icon name="browsing-history-o" /></div>
         <div>A</div>
       </div>
     </van-popup>
-    <div id="content" class="content">
+    <div :class="`font-${readFontize}`" id="content" class="content">
       <p v-if="chapterData" class="title"> {{ chapterData.title }} </p>
       <p v-for="(item, index) in content.split(/[\n | \t | \s]+/)" :key="'content'+index">{{ item }}</p>
     </div>
@@ -41,12 +43,16 @@
 
 <script>
 import merge from 'webpack-merge';
+import { Toast } from 'vant'
 import { getNovelChapter, getChapterContent } from '@/api'
 import { scrollTop } from '@/utils/index'
+import { mapState } from 'vuex'
 export default {
   name:'',
   data(){
    return {
+    value: this.readFontize,
+    chapterTitle: '',
     page: 1,
     pageSize: 6000,
     chapterList: [],
@@ -57,10 +63,39 @@ export default {
     isTop: true
    }
   },
+  computed: {
+    ...mapState(['readFontize'])
+  },
   created() {
     this.getNovelChapter()
   },
   methods: {
+    prev() {
+      const index = this.$route.query.index - 0
+      if(index <= 0) {
+        Toast('到头了！')
+        return
+      }
+      this.chapterData = this.chapterList[index - 1]
+      this.getChapterContent(this.chapterList[index - 1].id)
+      this.$router.push({query:merge(this.$route.query,{'index': index - 1})})
+    },
+    next() {
+      const index = this.$route.query.index - 0
+      if(index >= this.chapterList.length - 1) {
+        Toast('看完了！')
+        return
+      }
+      this.chapterData = this.chapterList[index - 1]
+      this.getChapterContent(this.chapterList[index + 1].id)
+      this.$router.push({query:merge(this.$route.query,{'index': index + 1})})
+    },
+    toRead(chapter) {
+      this.$router.push({query:merge(this.$route.query,{'index': chapter.index})})
+      this.chapterData = chapter
+      this.getChapterContent(chapter.id)
+      this.showChapter = false
+    },
     scrollTop() {
       const el = document.querySelector('.chapterList')
       this.isTop = !this.isTop
@@ -78,13 +113,14 @@ export default {
       const id = this.$route.query.id
       getNovelChapter({ id: id, page: this.page, pageSize: this.pageSize }).then(res => {
         this.chapterList = this.chapterList.concat(res.data)
-        if(this.$route.query.chapterId == null) {
+        if(this.$route.query.index == null) {
           this.getChapterContent(this.chapterList[0].id)
-          this.$router.push({query:merge(this.$route.query,{'chapterId': this.chapterList[0].id})})
+          this.$router.push({query:merge(this.$route.query,{'index': this.chapterList[0].index})})
           this.chapterData = this.chapterList[0]
-          console.log(this.chapterData)
         }else{
-          this.getChapterContent(this.$route.query.id)
+          const index = this.$route.query.index - 0
+          this.chapterData = this.chapterList[index]
+          this.getChapterContent(this.chapterList[index].id)
         }
       })
     },
@@ -183,6 +219,9 @@ export default {
       line-height: 25px;
       text-align: left;
     }
+  }
+  .font-16{
+    font-size: 16px;
   }
   .my-swipe{
     height: 100%;
