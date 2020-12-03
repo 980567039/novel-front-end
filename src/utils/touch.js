@@ -14,6 +14,7 @@ function vueTouch(el, binding, type) { //触屏函数
 	this.vueLeave = true
 	this.vueCallBack = typeof (binding.value) == 'object' ? binding.value.fn : binding.value
 	this.obj.addEventListener('touchstart', function (e) {
+		// console.log(e)
 		_this.start(e)
 	}, false)
 	this.obj.addEventListener('touchend', function (e) {

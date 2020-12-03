@@ -73,6 +73,13 @@ export default {
       .text{
         padding-left: 15px;
         text-align: left;
+        >p{
+          margin: 10px 0;
+          font-size: 14px;
+        }
+        >p:first-child{
+          font-size: 18px;
+        }
       }
     }
   }

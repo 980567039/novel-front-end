@@ -9,7 +9,6 @@ export default new Router({
     { path: '/bookCollect',  meta: { name: '书架' }, component: () => _import('views/BookCollect')},
     { path: '/categories',  meta: { name: '分类' }, component: () => _import('views/Categories'),},
     { path: '/categories/list',  meta: { name: '' }, component: () => _import('components/CategoriesList')},
-    { path: '/search',  meta: { name: '' }, component: () => _import('views/Search')},
     { path: '/rank',  meta: { name: '排行' }, component: () => _import('views/Rank')},
     { path: '/search',  meta: { name: '搜索' }, component: () => _import('views/Search')},
     { path: '/novelInfo',  meta: { name: '' }, component: () => _import('components/NovelInfo')},

@@ -8,7 +8,8 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
   state: {
     title: '',
-    readFontize: 16 
+    readFontize: 16,
+    readBackground: ''
   },
   mutations: {
     SET_STATE(commit, state) {

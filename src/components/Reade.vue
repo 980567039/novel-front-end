@@ -1,5 +1,5 @@
 <template>
-  <div v-swipeleft="next" v-swiperight="prev" @click.stop="swipedown" id="reade" class="flexContent">
+  <div @click.stop="swipedown" id="reade" class="flexContent">
     <van-popup 
       v-model="showChapter"
       position="bottom"
@@ -23,17 +23,25 @@
         </div>
       </div>
     </van-popup>
-    <van-popup v-model="showTools" position="bottom" :overlay="false" :style="{ height: '8%' }">
-      <van-slider v-model="value" :min="12" :max="30" />
+    <van-popup v-model="showTools" position="bottom" :overlay="false" :class="readBackground" >
+      <div class="setBackground">
+        <div v-for="(item, index) in bgList" :key="'color'+index" class="item">
+          <div @click.stop="setBackground(item)" :class="[{'active': item == readBackground}, item]" class="ball"></div>
+        </div>
+      </div>
+      <div v-if="showFontSize" class="setFontSize">
+        <van-slider v-model="fontSize" @change="fontSizeChange" :min="12" :max="30" :step="2" />
+      </div>
       <div class="tools van-hairline--top">
         <div @click="showChapter = true"><van-icon name="wap-nav" /></div>
         <div><van-icon name="browsing-history-o" /></div>
-        <div>A</div>
+        <div @click.stop="showFontSize = !showFontSize">A</div>
       </div>
     </van-popup>
-    <div :class="`font-${readFontize}`" id="content" class="content">
+    <div v-swipeleft="next" v-swiperight="prev" :class="`font-${readFontize} ${readBackground}`" id="content" class="content">
       <p v-if="chapterData" class="title"> {{ chapterData.title }} </p>
       <p v-for="(item, index) in content.split(/[\n | \t | \s]+/)" :key="'content'+index">{{ item }}</p>
+      <p class="hasBottom"></p>
     </div>
     <!-- <van-swipe @change="change" :loop="false" class="my-swipe" indicator-color="white">
       <van-swipe-item v-for="(item, index) in arr" :key="'content'+index"> {{item}} </van-swipe-item>
@@ -51,7 +59,7 @@ export default {
   name:'',
   data(){
    return {
-    value: this.readFontize,
+    fontSize: null,
     chapterTitle: '',
     page: 1,
     pageSize: 6000,
@@ -60,16 +68,26 @@ export default {
     showChapter: false,
     chapterData: null,
     content: '',
-    isTop: true
+    isTop: true,
+    showFontSize: false,
+    bgList: ['gray', 'yellow', 'green', 'black']
    }
   },
   computed: {
-    ...mapState(['readFontize'])
+    ...mapState(['readFontize', 'readBackground'])
   },
   created() {
     this.getNovelChapter()
+    this.fontSize = this.readFontize
+    console.log(this.fontSize)
   },
   methods: {
+    setBackground(color) {
+      this.$store.commit('SET_STATE', { key: 'readBackground', val: color })
+    },
+    fontSizeChange(value) {
+      this.$store.commit('SET_STATE', { key: 'readFontize', val: value })
+    },
     prev() {
       const index = this.$route.query.index - 0
       if(index <= 0) {
@@ -219,10 +237,40 @@ export default {
       line-height: 25px;
       text-align: left;
     }
+    .hasBottom{
+      height: 54px;
+    }
   }
-  .font-16{
-    font-size: 16px;
+  .setFontSize{
+    height: 50px;
+    padding: 25px 20px;
+    box-sizing: border-box;
   }
+  .setBackground{
+    padding: 10px 20px;
+    display: flex;
+    .item{
+      flex: 1;
+      .ball{
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin: 0 auto;
+      }
+      .active{
+        box-shadow: 0 1px 5px 0;
+      }
+    }
+  }
+  .font-12{ font-size: 12px; }
+  .font-14{ font-size: 14px; }
+  .font-16{ font-size: 16px; }
+  .font-18{ font-size: 18px; }
+  .font-20{ font-size: 20px; }
+  .gray{ background: ghostwhite; }
+  .yellow{ background:#fffce2 }
+  .green{ background:#cffdcf }
+  .black{ background: #5f5f5f; color: #fff; }
   .my-swipe{
     height: 100%;
   }
